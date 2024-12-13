@@ -1,7 +1,15 @@
-using DataFrames
-da0 = DataFrame(
-    name=["a", "b", "c", "d"], 
-    age=[33, 42, missing, 51],
-    sex=["M", "F", "M", "M"])
-da1 = copy(da0)
-ismissing.(da1[!,:age])|>show
+using DataFrames, DataFramesMeta, CSV
+using CategoricalArrays
+using CairoMakie
+CairoMakie.activate!()
+dclass = CSV.read("data/class19.csv", DataFrame)
+transform!(dclass,
+    :sex => (s -> categorical(s)),
+    renamecols = false)
+transform!(dclass, :sex => (x -> levelcode.(x)) => :sexi,
+    :age => categorical => :agec)
+println(first(dclass,5))
+
+da0 = copy(dclass)
+sort!(da0,:height)
+lines(da0[:,:height], da0[:,:weight])
